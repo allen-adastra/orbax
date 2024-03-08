@@ -7,7 +7,7 @@ import chex
 import epath
 import equinox as eqx
 import jax
-
+import jaxtyping
 import orbax.checkpoint as ocp
 
 
@@ -23,16 +23,14 @@ class EquinoxCheckpointHandler(ocp.CheckpointHandler):
         args: "EquinoxStateSave",
     ):
         full_path = directory / "model.eqx"
-        eqx.tree_serialise_leaves(full_path, args.item, is_leaf=eqx.is_array_like)
+        eqx.tree_serialise_leaves(full_path, args.item)
 
     def restore(
         self,
         directory: epath.Path,
         args: "EquinoxStateRestore",
     ) -> eqx.Module:
-        loaded = eqx.tree_deserialise_leaves(
-            directory / "model.eqx", args.item, is_leaf=eqx.is_array_like
-        )
+        loaded = eqx.tree_deserialise_leaves(directory / "model.eqx", args.item)
         return loaded
 
 
@@ -48,9 +46,8 @@ class EquinoxStateRestore(ocp.args.CheckpointArgs):
     item: eqx.Module
 
 
-def build_random_nn(key: jax.random.PRNGKey):
-    nn = eqx.nn.MLP(in_size=2, out_size=1, width_size=64, depth=2, key=key)
-    return nn
+def build_random_nn(key: jaxtyping.PRNGKeyArray) -> eqx.nn.MLP:
+    return eqx.nn.MLP(in_size=2, out_size=1, width_size=64, depth=2, key=key)
 
 
 TEMP_DIR = tempfile.mkdtemp()
