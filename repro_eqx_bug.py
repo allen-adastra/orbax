@@ -47,14 +47,18 @@ class EquinoxStateRestore(ocp.args.CheckpointArgs):
     item: eqx.Module
 
 
-def build_random_nn(key: jaxtyping.PRNGKeyArray) -> eqx.nn.MLP:
-    return eqx.nn.MLP(in_size=2, out_size=1, width_size=64, depth=2, key=key)
+def build_random_nn(key: jax.random.PRNGKey) -> eqx.nn.MLP:
+    net = eqx.nn.MLP(in_size=2, out_size=1, width_size=64, depth=2, key=key)
+    return net
 
 
 TEMP_DIR = tempfile.mkdtemp()
 
+print(TEMP_DIR)
+
 
 def test_eqx_save():
+    print(TEMP_DIR)
     # Build and save a random NN
     nn = build_random_nn(key=jax.random.PRNGKey(42))
     eqx.tree_serialise_leaves(os.path.join(TEMP_DIR, "model_eqx_save.eqx"), nn)
