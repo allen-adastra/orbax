@@ -23,14 +23,15 @@ class EquinoxCheckpointHandler(ocp.CheckpointHandler):
         args: "EquinoxStateSave",
     ):
         full_path = directory / "model.eqx"
-        eqx.tree_serialise_leaves(full_path, args.item)
+        eqx.tree_serialise_leaves(str(full_path), args.item)
 
     def restore(
         self,
         directory: epath.Path,
         args: "EquinoxStateRestore",
     ) -> eqx.Module:
-        loaded = eqx.tree_deserialise_leaves(directory / "model.eqx", args.item)
+        full_path = directory / "model.eqx"
+        loaded = eqx.tree_deserialise_leaves(str(full_path), args.item)
         return loaded
 
 
